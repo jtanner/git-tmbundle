@@ -51,23 +51,30 @@ module SCM
       logger.error(str) if debug_mode
       str
     end
-
-    def command_verbose(*args)
-      r = %x{#{command_str(*args)} 2>&1 }
-      puts "<pre>#{command_str(*args)}</pre>"
-      puts "Result: <pre>#{r}</pre>"
-      r
+    
+    def should_print_verbose?
+      ENV['GIT_BUNDLE_VERBOSE_COMMANDS'] == 'true'
+    end
+    
+    def print_command_verbose(result, *args)
+      return if args.first == 'ls-files'
+      puts "<pre>$ #{e_sh git} #{args.map{ |arg| e_sh(arg) } * ' '}"
+      puts "#{result}</pre>"
     end
     
     # Run a command a return it's results
     def command(*args)
-      %x{#{command_str(*args)} 2>&1 }
+      r = %x{#{command_str(*args)} 2>&1 }
+      print_command_verbose(r, *args) if should_print_verbose?
+      r
     end
     
     # Run a command with POPEN
     def popen_command(*args)
       cmd = command_str(*args)
-      IO.popen("#{cmd} 2>&1", "r")
+      r = IO.popen("#{cmd} 2>&1", "r")
+      print_command_verbose(r, *args) if should_print_verbose?
+      r
     end
     
     # Return the full working path to "git"

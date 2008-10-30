@@ -102,8 +102,8 @@ ul {
   margin-right: 0.5em;
 }
 pre {
-  margin-left: 2em;
-  margin-right: 2em;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 ul li h1, ul li h2, ul li h3, ul li h4 {

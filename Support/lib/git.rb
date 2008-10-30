@@ -56,8 +56,9 @@ module SCM
       ENV['GIT_BUNDLE_VERBOSE_COMMANDS'] == 'true'
     end
     
+    COMMANDS_TO_IGNORE = ['for-each-ref','ls-files']
     def print_command_verbose(result, *args)
-      return if args.first == 'ls-files'
+      return if COMMANDS_TO_IGNORE.include?(args.first)
       puts "<pre>$ #{e_sh git} #{args.map{ |arg| e_sh(arg) } * ' '}"
       puts "#{result}</pre>"
     end

@@ -56,11 +56,15 @@ module SCM
       ENV['GIT_BUNDLE_VERBOSE_COMMANDS'] == 'true'
     end
     
-    COMMANDS_TO_IGNORE = ['for-each-ref','ls-files']
+    COMMANDS_TO_IGNORE = ['for-each-ref','ls-files','rev-parse','describe']
+    COMMANDS_ONLY      = ['log','annotate','diff']
     def print_command_verbose(result, *args)
-      return if COMMANDS_TO_IGNORE.include?(args.first)
-      puts "<pre>$ #{e_sh git} #{args.map{ |arg| e_sh(arg) } * ' '}"
-      puts "#{result}</pre>"
+      command = args.first
+      return if COMMANDS_TO_IGNORE.include?(command)
+      out = "<pre>$ #{e_sh git} #{args.map{ |arg| e_sh(arg) } * ' '}"
+      out << "#{result}</pre>" unless COMMANDS_ONLY.include?(command)
+      out << '</pre>'
+      puts out
     end
     
     # Run a command a return it's results

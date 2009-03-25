@@ -61,7 +61,7 @@ module SCM
     def print_command_verbose(result, *args)
       command = args.first
       return if COMMANDS_TO_IGNORE.include?(command)
-      out = "<pre>$ #{e_sh git} #{args.map{ |arg| e_sh(arg) } * ' '}"
+      out = "<pre>$ git #{args.map{ |arg| e_sh(arg) } * ' '}"
       out << "\n#{result}</pre>" unless COMMANDS_ONLY.include?(command)
       out << '</pre>'
       puts out

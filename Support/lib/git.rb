@@ -60,11 +60,18 @@ module SCM
     COMMANDS_ONLY      = ['log','annotate','diff','stash']
     def print_command_verbose(result, *args)
       command = args.first
-      return if COMMANDS_TO_IGNORE.include?(command)
+      return if COMMANDS_TO_IGNORE.include?(command) || command_already_printed?(command, args)
       out = "<pre>$ git #{args.map{ |arg| e_sh(arg) } * ' '}"
       out << "\n#{result}</pre>" unless COMMANDS_ONLY.include?(command)
       out << '</pre>'
       puts out
+    end
+    
+    def command_already_printed?(command, args)
+      @@already_printed ||= Set.new
+      already_printed = @@already_printed.include?([command, args])
+      @@already_printed << [command, args]
+      already_printed
     end
     
     # Run a command a return it's results

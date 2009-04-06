@@ -57,7 +57,7 @@ module SCM
     end
     
     COMMANDS_TO_IGNORE = ['for-each-ref','ls-files','rev-parse','rev-list','describe','config','stash-list']
-    COMMANDS_ONLY      = ['log','annotate','diff','stash']
+    COMMANDS_ONLY      = ['log','annotate','diff','stash','status']
     def print_command_verbose(result, *args)
       command = args.first
       return if COMMANDS_TO_IGNORE.include?(command) || command_already_printed?(command, args)

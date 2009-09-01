@@ -212,8 +212,6 @@ module SCM
       file = File.dirname(__FILE__) + "/commands/#{name.to_s.downcase}.rb"
       require file
       klass = const_get(name)
-    rescue LoadError
-      raise "Class not found: #{name}"
     end
     
     def merge_message
@@ -226,25 +224,10 @@ module SCM
     end
     
     def status(file_or_dir = nil, options = {})
-      file_or_dir = file_or_dir.flatten.first if file_or_dir.is_a?(Array)
-      
       results = parse_status(command("status"))
-      
-      if file_or_dir
-        file_or_dir = path_for(file_or_dir).dup
-        file_or_dir << "/" if File.directory?(file_or_dir) && file_or_dir[-1..-1] != "/"
-        results.select do |status|
-          if is_a_path?(status[:path]) && /^#{Regexp.escape(status[:path])}/i.match(file_or_dir)
-            # promote this status on down and keep it if it's the parent folder of our target file_or_dir
-            status[:path] = file_or_dir
-            status[:display] = shorten(file_or_dir, path)
-            true
-          else
-            /^#{Regexp.escape(file_or_dir)}/i.match(status[:path])
-          end
-        end
-      else
-        results
+      return results if file_or_dir.nil?
+      results.select do |status|
+        Array(file_or_dir).find { |e| status[:path] =~ /^#{Regexp.escape(e)}(\/|$)/ }
       end
     end
 
@@ -397,7 +380,7 @@ module SCM
       end
 
       output = command(*params)
-      File.open("/tmp/output.diff", "w") {|f| f.puts check + output }
+      File.open("/tmp/output.diff", "a") {|f| f.puts check + output }
       parse_diff(output)
     end
     
@@ -416,7 +399,7 @@ module SCM
     
     def init(directory)
       Dir.chdir(directory) do
-        %x{git init}
+        %x{"${TM_GIT:-git}" init}
       end
     end
     
